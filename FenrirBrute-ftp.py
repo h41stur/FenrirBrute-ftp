@@ -184,7 +184,7 @@ def main(argv):
 	test(host,port)
 
 
-	# calcula o tamano=ho da wordlist de usuarios
+	# calcula o tamanho da wordlist de usuarios
 	try:
 		if userlist != '':
 			with open(userlist) as dfuser:
