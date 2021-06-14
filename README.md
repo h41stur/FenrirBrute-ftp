@@ -1,6 +1,6 @@
 <img src="https://raw.githubusercontent.com/leonardor666/images/main/fenrir.jpg"  height="600" />
 
-# FenrirCrack é uma ferramenta de bruteforce de FTP
+# FenrirBrute-ftp é uma ferramenta de bruteforce
 
 FenrirBrute-ftp é uma ferramenta para bruteforce de FTP que permite ataques com usuário e lista de senhas, lista de usuários e lista de senhas e também ataque spray, com uma senha e uma lista de usuários.
 
